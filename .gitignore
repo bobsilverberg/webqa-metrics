@@ -1,0 +1,4 @@
+*.pyc
+/results/*
+tests/results/*
+.DS_Store
