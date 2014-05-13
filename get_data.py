@@ -4,6 +4,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import csv
+import datetime
 import json
 
 import bugzilla_api
@@ -13,25 +15,27 @@ class BugzillaGatherer(object):
 
     def __init__(self):
         self.bmo = bugzilla_api.BugzillaAPI()
+        self.bug_fields = ['assigned_to', 'component', 'creation_time', 'id',
+                           'keywords', 'last_change_time', 'priority', 'product',
+                           'resolution', 'severity', 'status', 'summary',
+                           'whiteboard']
 
     def get_bugs(self):
         criteria = [{'product': 'Firefox OS',
                      'component': 'Gaia::UI Tests',
                      'component_type': 'not_equals',
                      'whiteboard': 'fromAutomation'}]
-        bug_fields = ['assigned_to', 'component', 'creation_time', 'id',
-                      'keywords', 'last_change_time', 'priority', 'product',
-                      'resolution', 'severity', 'status', 'summary',
-                      'whiteboard']
         for criteria_set in criteria:
             bug_list = self.bmo.get_bug_list(criteria_set)
             all_bugs = []
             for bug in bug_list:
                 bug_obj = {}
-                for field in bug_fields:
+                for field in self.bug_fields:
                     bug_obj[field] = bug[field]
                 all_bugs.append(bug_obj)
             print all_bugs
+        self._generate_json_file(all_bugs)
+        self._generate_csv_file(all_bugs)
 
         return True
 
@@ -114,9 +118,15 @@ class BugzillaGatherer(object):
 
     def _generate_json_file(self, json_results):
         final = {'last_updated': str(datetime.datetime.now()), 'results': json_results}
-        with open('data/marketplace_jobs_results.json', 'w') as outfile:
+        with open('data/bugs.json', 'w') as outfile:
             json.dump(final, outfile)
 
+    def _generate_csv_file(self, results):
+        with open('data/bugs.csv', 'w') as outfile:
+            writer = csv.DictWriter(outfile, self.bug_fields)
+            writer.writer.writerow(self.bug_fields)
+            for dict in results:
+                writer.writerow(dict)
 
 if __name__ == '__main__':
 
