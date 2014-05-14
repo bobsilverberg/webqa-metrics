@@ -31,7 +31,11 @@ class BugzillaGatherer(object):
             for bug in bug_list:
                 bug_obj = {}
                 for field in self.bug_fields:
-                    bug_obj[field] = bug[field]
+                    value = bug[field]
+                    if type(value) is dict:
+                        bug_obj[field] = value.values()
+                    else:
+                        bug_obj[field] = value
                 all_bugs.append(bug_obj)
             print all_bugs
         self._generate_json_file(all_bugs)

@@ -20,12 +20,17 @@
 
         $('#example').dataTable( {
           data: results,
-           columnDefs: [ {
-             targets: 0,
-             render: function ( data, type, row ) {
-               return data['product'];
-              }
-            } ]
+          columns: [
+            { title: 'ID', data: 'id' },
+            { title: 'Product', data: 'product' },
+            { title: 'Component', data: 'component' },
+            { title: 'Created', data: 'creation_time', type: 'date' },
+            { title: 'Updated', data: 'last_change_time' },
+            { title: 'Status', data: 'status' },
+            { title: 'Resolution', data: 'resolution' },
+            { title: 'Summary', data: 'summary' },
+            { title: 'Keywords', data: 'keywords' }
+          ]
         });
       });
     });
